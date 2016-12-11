@@ -1,5 +1,7 @@
 package uk.dom.quizapp.adapters;
 
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,6 +60,14 @@ public class CategoryChooserAdapter extends RecyclerView.Adapter<CategoryChooser
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.categoryName.setText(dataset.get(position).getName());
         holder.categoryImage.setImageResource(dataset.get(position).getImage());
+
+        if(dataset.get(position).isLocked() == true){
+            ColorMatrix matrix = new ColorMatrix();
+            matrix.setSaturation(0);  //0 means grayscale
+            ColorMatrixColorFilter cf = new ColorMatrixColorFilter(matrix);
+            holder.categoryImage.setColorFilter(cf);
+            holder.categoryImage.setAlpha(0.5f);   // 128 = 0.5
+        }
     }
 
     @Override

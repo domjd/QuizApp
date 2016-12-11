@@ -2,10 +2,6 @@ package uk.dom.quizapp.models;
 
 import android.util.Log;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -19,11 +15,10 @@ import uk.dom.quizapp.tools.QuizService;
  */
 public class QuizInteractor implements Callback<Quiz> {
 
-    private OnQuizInteractorFinshedListener listener;
-    String sessionToken;
+    private OnQuizInteractorFinshedListener quizListener;
 
     public QuizInteractor(OnQuizInteractorFinshedListener listener) {
-        this.listener = listener;
+        this.quizListener = listener;
     }
 
     private Retrofit retrofit(){
@@ -34,43 +29,37 @@ public class QuizInteractor implements Callback<Quiz> {
         return rf;
     }
 
-    public void getSessionToken(){
+    public void generateSessionToken(){
         QuizService quizService = retrofit().create(QuizService.class);
-        Call<String> token = quizService.getSessionToken();
-        token.enqueue(new Callback<String>() {
+        Call<SessionToken> token = quizService.getSessionToken();
+        token.enqueue(new Callback<SessionToken>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                Log.v("TOKEN:", sessionToken);
-                sessionToken = (String) response.body();
+            public void onResponse(Call<SessionToken> call, Response<SessionToken> response) {
+                //quizListener.onSessionTokenGeneratedSuccess(call,response);
+
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
-
+            public void onFailure(Call<SessionToken> call, Throwable t) {
+                //quizListener.onSessionTokenGeneratedFailure(call, t);
             }
         });
     }
 
-    public void loadQuiz(){
-        ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
-        ses.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                getSessionToken();
-            }
-        },0,6,TimeUnit.HOURS);
+
+    public void loadQuiz(int categoryID){
         QuizService quizService = retrofit().create(QuizService.class);
-        Call<Quiz> quiz = quizService.getQuiz(sessionToken);
-        quiz.enqueue(this);
+        Call<Quiz> quiz = quizService.getQuiz(categoryID);
+        quiz.enqueue(QuizInteractor.this);
     }
 
     @Override
     public void onResponse(Call<Quiz> call, Response<Quiz> response) {
-        listener.onNetworkSuccess(call, response);
+        quizListener.onNetworkSuccess(call, response);
     }
 
     @Override
     public void onFailure(Call<Quiz> call, Throwable t) {
-        listener.onNetworkFailure(call, t);
+        quizListener.onNetworkFailure(call, t);
     }
 }

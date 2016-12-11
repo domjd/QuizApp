@@ -1,13 +1,19 @@
 package uk.dom.quizapp.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Description;
@@ -23,14 +29,21 @@ import java.util.List;
 
 import uk.dom.quizapp.adapters.CategoryAdapter;
 import uk.dom.quizapp.R;
+import uk.dom.quizapp.presenters.DatabasePresenter;
 
 public class MainActivity extends AppCompatActivity {
 
-    PieChart pieChart;
+    private PieChart pieChart;
 
-    RecyclerView categoryRecycler;
-    LinearLayoutManager linearLayoutManager;
-    CategoryAdapter categoryAdapter;
+    private RecyclerView categoryRecycler;
+    private LinearLayoutManager linearLayoutManager;
+    private CategoryAdapter categoryAdapter;
+
+    private DatabasePresenter presenter;
+
+    private LinearLayout noDataLayout;
+    private LinearLayout pieLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,19 +52,36 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ArrayList<BarEntry> yValues = new ArrayList<BarEntry>();
-        yValues.add(new BarEntry(0, new float[]{ 60, 40 }));
-        yValues.add(new BarEntry(0, new float[]{ 70, 30 }));
-        yValues.add(new BarEntry(0, new float[]{ 40, 60 }));
-        yValues.add(new BarEntry(0, new float[]{ 80, 20 }));
+        noDataLayout = (LinearLayout) findViewById(R.id.no_data_layout);
 
-        setupPieChart();
+        presenter = new DatabasePresenter(this);
 
-        categoryRecycler = (RecyclerView) findViewById(R.id.category_recycler);
-        linearLayoutManager = new LinearLayoutManager(this);
-        categoryAdapter = new CategoryAdapter(yValues);
-        categoryRecycler.setLayoutManager(linearLayoutManager);
-        categoryRecycler.setAdapter(categoryAdapter);
+        TextView noDataText = (TextView) findViewById(R.id.no_data_text);
+        ImageView noDataImage = (ImageView) findViewById(R.id.no_data_image);
+
+        if(presenter.checkIsDataNull() == true){
+            CardView summaryCard = (CardView) findViewById(R.id.pie_card);
+            CardView statsCard = (CardView) findViewById(R.id.category_stats_card);
+
+            summaryCard.setVisibility(View.INVISIBLE);
+            statsCard.setVisibility(View.INVISIBLE);
+
+            noDataText.setVisibility(View.VISIBLE);
+            noDataImage.setVisibility(View.VISIBLE);
+        }
+
+        else{
+
+            noDataText.setVisibility(View.INVISIBLE);
+            noDataImage.setVisibility(View.VISIBLE);
+            setupPieChart();
+
+            categoryRecycler = (RecyclerView) findViewById(R.id.category_recycler);
+            linearLayoutManager = new LinearLayoutManager(this);
+            categoryAdapter = new CategoryAdapter(presenter.getCategoryValues());
+            categoryRecycler.setLayoutManager(linearLayoutManager);
+            categoryRecycler.setAdapter(categoryAdapter);
+        }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -94,12 +124,7 @@ public class MainActivity extends AppCompatActivity {
         legend.setTextSize(14f);
         legend.setDrawInside(false);
 
-        List<PieEntry> entries = new ArrayList<>();
-
-        entries.add(new PieEntry(18.5f, "Correct Answers"));
-        entries.add(new PieEntry(26.7f, "Wrong Answers"));
-
-        PieDataSet set = new PieDataSet(entries, "");
+        PieDataSet set = new PieDataSet(presenter.getPieChartValues(), "");
         set.setColors(ColorTemplate.MATERIAL_COLORS);
         set.setSliceSpace(8);
         set.setSelectionShift(5);
@@ -108,6 +133,6 @@ public class MainActivity extends AppCompatActivity {
 
         PieData data = new PieData(set);
         pieChart.setData(data);
-        pieChart.invalidate(); // refresh
+        pieChart.invalidate(); // refresh*/
     }
 }

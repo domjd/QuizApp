@@ -7,13 +7,21 @@ import android.graphics.Bitmap;
  */
 public class Category {
 
+
     private int id;
     private String name;
     private int image;
+    private int correctAnswerTotal;
+    private int wrongAnswerTotal;
+    private boolean isLocked;
 
-    public Category(String name, int image) {
+    public Category(String name, int image, int id, boolean isLocked) {
+        this.id = id;
         this.name = name;
         this.image = image;
+        setLocked(isLocked);
+        setCorrectAnswerTotal(0);
+        setWrongAnswerTotal(0);
     }
 
     public Category(){
@@ -42,5 +50,29 @@ public class Category {
 
     public void setImage(int image) {
         this.image = image;
+    }
+
+    public int getCorrectAnswerTotal() {
+        return correctAnswerTotal;
+    }
+
+    public void setCorrectAnswerTotal(int correctAnswerTotal) {
+        this.correctAnswerTotal = correctAnswerTotal;
+    }
+
+    public int getWrongAnswerTotal() {
+        return wrongAnswerTotal;
+    }
+
+    public void setWrongAnswerTotal(int wrongAnswerTotal) {
+        this.wrongAnswerTotal = wrongAnswerTotal;
+    }
+
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void setLocked(boolean locked) {
+        isLocked = locked;
     }
 }

@@ -21,9 +21,10 @@ import uk.dom.quizapp.tools.QuizCallBack;
  */
 public class QuestionFragment extends Fragment {
 
-    QuizCallBack quizCallBack;
-    Question question;
-    List<String> answers;
+    private QuizCallBack quizCallBack;
+    private Question question;
+    private List<String> answers;
+    private int questionNumber;
 
 
     public QuestionFragment() {
@@ -42,6 +43,10 @@ public class QuestionFragment extends Fragment {
         this.answers = answers;
     }
 
+    public void setQuestionNumber(int questionNumber){
+        this.questionNumber = questionNumber;
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -53,7 +58,7 @@ public class QuestionFragment extends Fragment {
         final Button answerC = (Button) v.findViewById(R.id.answer_c);
         final Button answerD = (Button) v.findViewById(R.id.answer_d);
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+        if (android.os.Build.VERSION.SDK_INT >= 24) {
             questionView.setText(Html.fromHtml(question.getQuestion(), Html.FROM_HTML_MODE_LEGACY));
 
             answerA.setText(Html.fromHtml(answers.get(0), Html.FROM_HTML_MODE_LEGACY));
@@ -70,35 +75,35 @@ public class QuestionFragment extends Fragment {
             answerD.setText(Html.fromHtml(answers.get(3)));
         }
 
-        answerA.setText(answers.get(0));
+
         answerA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                quizCallBack.onAnswerReceived(answerA.getText().toString());
+                quizCallBack.onAnswerReceived(questionNumber, question.getQuestion(), answerA.getText().toString(), question.getCorrectAnswer());
             }
         });
 
-        answerB.setText(answers.get(1));
+
         answerB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                quizCallBack.onAnswerReceived(answerB.getText().toString());
+                quizCallBack.onAnswerReceived(questionNumber, question.getQuestion() ,answerB.getText().toString(), question.getCorrectAnswer());
             }
         });
 
-        answerC.setText(answers.get(2));
+
         answerC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                quizCallBack.onAnswerReceived(answerC.getText().toString());
+                quizCallBack.onAnswerReceived(questionNumber, question.getQuestion() ,answerC.getText().toString(), question.getCorrectAnswer());
             }
         });
 
-        answerD.setText(answers.get(3));
+
         answerD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                quizCallBack.onAnswerReceived(answerD.getText().toString());
+                quizCallBack.onAnswerReceived(questionNumber, question.getQuestion() ,answerD.getText().toString(), question.getCorrectAnswer());
             }
         });
 

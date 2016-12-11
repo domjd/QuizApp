@@ -10,12 +10,12 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import uk.dom.quizapp.R;
 import uk.dom.quizapp.adapters.CategoryChooserAdapter;
 import uk.dom.quizapp.models.Category;
+import uk.dom.quizapp.presenters.DatabasePresenter;
 import uk.dom.quizapp.tools.CategoryListener;
 
 public class CategoryActivity extends AppCompatActivity implements CategoryListener{
@@ -24,6 +24,10 @@ public class CategoryActivity extends AppCompatActivity implements CategoryListe
     GridLayoutManager gridLayoutManager;
     CategoryChooserAdapter adapter;
 
+    List<Category> categories;
+
+    DatabasePresenter presenter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,21 +35,17 @@ public class CategoryActivity extends AppCompatActivity implements CategoryListe
         setContentView(R.layout.activity_category);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
         setTitle("Choose a category");
 
-        List<Category> categories = new ArrayList<>();
-        Category c = new Category("Entertainment", R.drawable.comedy);
-        categories.add(c);
-        c = new Category("Geography", R.drawable.planet);
-        categories.add(c);
-        c = new Category("Arts", R.drawable.palette);
-        categories.add(c);
-        c = new Category("Sports", R.drawable.medal);
-        categories.add(c);
+        presenter = new DatabasePresenter(this);
 
         categoryChooserRecycler = (RecyclerView) findViewById(R.id.category_chooser_recycler);
         gridLayoutManager = new GridLayoutManager(this, 2);
-        adapter = new CategoryChooserAdapter(categories, this);
+        adapter = new CategoryChooserAdapter(presenter.returnCategories(), this);
         categoryChooserRecycler.setLayoutManager(gridLayoutManager);
         categoryChooserRecycler.setAdapter(adapter);
 
@@ -62,6 +62,9 @@ public class CategoryActivity extends AppCompatActivity implements CategoryListe
     @Override
     public void onItemClick(View view, int position) {
         Intent i = new Intent(this, QuizActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("categoryID",presenter.returnCategories().get(position).getId());
+        i.putExtras(bundle);
         startActivity(i);
     }
 }

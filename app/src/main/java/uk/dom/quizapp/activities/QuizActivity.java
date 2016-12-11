@@ -1,6 +1,7 @@
 package uk.dom.quizapp.activities;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -17,6 +18,8 @@ import retrofit2.Call;
 import retrofit2.Response;
 import uk.dom.quizapp.R;
 import uk.dom.quizapp.fragments.QuestionFragment;
+import uk.dom.quizapp.fragments.QuizEndFragment;
+import uk.dom.quizapp.models.LocalQuestion;
 import uk.dom.quizapp.models.Question;
 import uk.dom.quizapp.models.Quiz;
 import uk.dom.quizapp.presenters.QuizPresenter;
@@ -29,9 +32,13 @@ public class QuizActivity extends AppCompatActivity implements QuizCallBack, Qui
     private QuizViewPager quizPager;
     private QuizPagerAdapter quizPagerAdapter;
 
+    private List<LocalQuestion> wrongQuestions;
+
     private QuizPresenter presenter;
 
     private ProgressDialog progressDialog;
+
+    private int categoryID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,17 +47,30 @@ public class QuizActivity extends AppCompatActivity implements QuizCallBack, Qui
 
         progressDialog = ProgressDialog.show(this, "Loading Quiz", null);
 
-        presenter = new QuizPresenter(this);
-        presenter.loadQuiz();
+        Intent i = getIntent();
+        categoryID = i.getExtras().getInt("categoryID");
+
+        presenter = new QuizPresenter(getApplicationContext(), this);
+
+        presenter.loadQuiz(categoryID);
 
         quizPager = (QuizViewPager) findViewById(R.id.quiz_pager);
         quizPagerAdapter = new QuizPagerAdapter(getSupportFragmentManager());
 
+        wrongQuestions = new ArrayList<>();
+
     }
 
     @Override
-    public void onAnswerReceived(String answer) {
+    public void onAnswerReceived(int questionNumber, String question, String userAnswer, String correctAnswer) {
+
+        if(userAnswer != correctAnswer){
+            LocalQuestion localQuestion = new LocalQuestion(question,userAnswer,correctAnswer);
+            wrongQuestions.add(localQuestion);
+        }
+
         quizPager.setCurrentItem(quizPager.getCurrentItem() + 1, true);
+
     }
 
     @Override
@@ -73,6 +93,9 @@ public class QuizActivity extends AppCompatActivity implements QuizCallBack, Qui
             quizPagerAdapter.addFragment(questionFragment);
         }
 
+        QuizEndFragment quizEndFragment = new QuizEndFragment();
+        quizEndFragment.setWrongQuestions(wrongQuestions);
+        quizPagerAdapter.addFragment(quizEndFragment);
         quizPager.setAdapter(quizPagerAdapter);
         progressDialog.dismiss();
     }
