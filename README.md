@@ -1,6 +1,6 @@
 # QuizApp
 
-A small, proof of concept quiz app to learn RetroFit, MPAndroidChat(https://github.com/PhilJay/MPAndroidChart) and the Model View Presenter design pattern.
+A small, proof of concept quiz app to learn RetroFit, MPAndroidChart (https://github.com/PhilJay/MPAndroidChart) and the Model View Presenter design pattern.
 
 <br>
 
