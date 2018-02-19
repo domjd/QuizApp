@@ -17,6 +17,10 @@ public interface IDatabasePresenter {
     Category returnCategory(int categoryID);
     ArrayList<BarEntry> getCategoryValues();
     List<PieEntry> getPieChartValues();
+    int getMarks();
+    int getCoins();
+    void resetTable();
+    void updateCategory(Category category, int correct_answer, int wrong_answers);
     void setupCategories();
     boolean checkIsDataNull();
 }

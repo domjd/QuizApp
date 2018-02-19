@@ -1,6 +1,7 @@
 package uk.dom.quizapp.fragments;
 
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -43,6 +44,10 @@ public class QuestionFragment extends Fragment {
         this.answers = answers;
     }
 
+    public List<String> getAnswers() {
+        return answers;
+    }
+
     public void setQuestionNumber(int questionNumber){
         this.questionNumber = questionNumber;
     }
@@ -50,7 +55,7 @@ public class QuestionFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_question, container, false);
+        final View v = inflater.inflate(R.layout.fragment_question, container, false);
 
         TextView questionView = (TextView) v.findViewById(R.id.question_text);
         final Button answerA = (Button) v.findViewById(R.id.answer_a);
@@ -79,7 +84,7 @@ public class QuestionFragment extends Fragment {
         answerA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                quizCallBack.onAnswerReceived(questionNumber, question.getQuestion(), answerA.getText().toString(), question.getCorrectAnswer());
+                quizCallBack.onAnswerReceived(questionNumber, question.getQuestion(), getAnswers().get(0), question.getCorrectAnswer());
             }
         });
 
@@ -87,7 +92,7 @@ public class QuestionFragment extends Fragment {
         answerB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                quizCallBack.onAnswerReceived(questionNumber, question.getQuestion() ,answerB.getText().toString(), question.getCorrectAnswer());
+                quizCallBack.onAnswerReceived(questionNumber, question.getQuestion() ,getAnswers().get(1), question.getCorrectAnswer());
             }
         });
 
@@ -95,7 +100,7 @@ public class QuestionFragment extends Fragment {
         answerC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                quizCallBack.onAnswerReceived(questionNumber, question.getQuestion() ,answerC.getText().toString(), question.getCorrectAnswer());
+                quizCallBack.onAnswerReceived(questionNumber, question.getQuestion() , getAnswers().get(2), question.getCorrectAnswer());
             }
         });
 
@@ -103,7 +108,7 @@ public class QuestionFragment extends Fragment {
         answerD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                quizCallBack.onAnswerReceived(questionNumber, question.getQuestion() ,answerD.getText().toString(), question.getCorrectAnswer());
+                quizCallBack.onAnswerReceived(questionNumber, question.getQuestion() ,getAnswers().get(3), question.getCorrectAnswer());
             }
         });
 

@@ -48,6 +48,7 @@ public class QuizEndFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_quiz_end, container, false);
 
+/*
         questionRecycler = (RecyclerView) v.findViewById(R.id.question_recycler);
         linearLayoutManager = new LinearLayoutManager(v.getContext());
         questionRecycler.setLayoutManager(linearLayoutManager);
@@ -57,6 +58,7 @@ public class QuizEndFragment extends Fragment {
         score = (TextView) v.findViewById(R.id.score_text);
         int scoreValue = 10 - getWrongQuestions().size();
         score.setText(String.valueOf(scoreValue) + "/10");
+*/
 
 
         // Inflate the layout for this fragment

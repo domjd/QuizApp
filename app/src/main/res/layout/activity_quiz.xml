@@ -11,4 +11,77 @@
         android:layout_height="match_parent"
         android:id="@+id/quiz_pager"></uk.dom.quizapp.ui.QuizViewPager>
 
+
+    <android.support.v7.widget.CardView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/end_card"
+        app:cardUseCompatPadding="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:padding="10dp"
+        app:cardElevation="20dp"
+        android:visibility="invisible">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:backgroundTintMode="screen">
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:text="Quiz Complete!"
+                    android:layout_marginBottom="10dp"/>
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:text="Score: 10/10"
+                    android:id="@+id/score_text" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:text="Go to question Summary"
+                        android:textColor="@android:color/white"
+                        android:id="@+id/question_summary_button"
+                        android:background="@color/colorAccent" />
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:text="Home"
+                        android:textColor="@android:color/white"
+                        android:id="@+id/home_button"
+                        android:background="@color/colorAccent" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+    </android.support.v7.widget.CardView>
+
+
+
+
 </RelativeLayout>

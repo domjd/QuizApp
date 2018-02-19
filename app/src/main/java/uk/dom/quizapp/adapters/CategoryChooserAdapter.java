@@ -67,6 +67,8 @@ public class CategoryChooserAdapter extends RecyclerView.Adapter<CategoryChooser
             ColorMatrixColorFilter cf = new ColorMatrixColorFilter(matrix);
             holder.categoryImage.setColorFilter(cf);
             holder.categoryImage.setAlpha(0.5f);   // 128 = 0.5
+
+            holder.itemView.setClickable(false);
         }
     }
 

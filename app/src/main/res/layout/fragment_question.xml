@@ -84,6 +84,17 @@
                             android:id="@+id/answer_d"
                             android:background="@color/colorAccent" />
 
+                        <Button
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="24dp"
+                            android:text="Next Question >>"
+                            android:textColor="@android:color/white"
+                            android:id="@+id/next_page"
+                            android:background="@color/colorPrimaryDark"
+                            android:visibility="gone" />
+
+
                 </LinearLayout>
             </LinearLayout>
     </FrameLayout>

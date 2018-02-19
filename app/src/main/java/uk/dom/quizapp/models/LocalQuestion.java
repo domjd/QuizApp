@@ -1,9 +1,14 @@
 package uk.dom.quizapp.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.io.Serializable;
+
 /**
  * Created by Dom on 07/12/2016.
  */
-public class LocalQuestion {
+public class LocalQuestion implements Serializable {
 
     private String question;
     private String userAnswer;
@@ -41,4 +46,5 @@ public class LocalQuestion {
     public void setCorrectAnswer(String correctAnswer) {
         this.correctAnswer = correctAnswer;
     }
+
 }

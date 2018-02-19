@@ -1,6 +1,7 @@
 package uk.dom.quizapp.adapters;
 
 import android.graphics.Color;
+import android.provider.ContactsContract;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import uk.dom.quizapp.R;
+import uk.dom.quizapp.models.Category;
+import uk.dom.quizapp.presenters.DatabasePresenter;
 
 /**
  * Created by Dom on 05/12/2016.
@@ -25,7 +28,6 @@ import uk.dom.quizapp.R;
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
 
     List<BarEntry> dataSet;
-    List<String> categoryNames;
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
@@ -33,23 +35,20 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         TextView categoryStat;
         HorizontalBarChart categoryChart;
 
+        DatabasePresenter dbPresenter;
+
         public ViewHolder(View v) {
             super(v);
             categoryName = (TextView) v.findViewById(R.id.category_name);
             categoryStat = (TextView) v.findViewById(R.id.category_stat);
             categoryChart = (HorizontalBarChart) v.findViewById(R.id.category_chart);
+
+            dbPresenter = new DatabasePresenter(v.getContext());
         }
     }
 
     public CategoryAdapter(List<BarEntry> dataSet) {
         this.dataSet = dataSet;
-
-        categoryNames = new ArrayList<>();
-
-        categoryNames.add("Entertainment");
-        categoryNames.add("Geography");
-        categoryNames.add("Art");
-        categoryNames.add("Sports");
     }
 
     @Override
@@ -62,13 +61,27 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.categoryName.setText(categoryNames.get(position));
+
+        Category category = holder.dbPresenter.returnCategories().get(position);
+
+        holder.categoryName.setText(category.getName());
 
         float[] values = dataSet.get(position).getYVals();
         ArrayList<BarEntry> yValues = new ArrayList<BarEntry>();
         yValues.add(dataSet.get(position));
 
-        holder.categoryStat.setText(String.format ("%.0f", values[0]) + "% answers correct");
+        if (category.getCorrectAnswerTotal() == 0 &&
+                category.getWrongAnswerTotal() == 0) {
+
+            holder.categoryStat.setText("No games played in this category yet");
+        }
+
+        else{
+            float percentageCorrect = (float)category.getCorrectAnswerTotal() /
+                    ((float)category.getCorrectAnswerTotal() + (float)category.getWrongAnswerTotal()) * 100;
+
+            holder.categoryStat.setText(String.format ("%.0f", percentageCorrect) + "% answers correct");
+        }
 
         setupChart(holder.categoryChart, yValues);
 

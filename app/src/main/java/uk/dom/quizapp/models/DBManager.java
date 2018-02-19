@@ -1,4 +1,4 @@
-package uk.dom.quizapp.tools;
+package uk.dom.quizapp.models;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -29,6 +29,10 @@ public class DBManager extends SQLiteOpenHelper {
     public static final String COLUMN_CATEGORY_ISLOCKED = "cat_is_locked";
     public static final String COLUMN_CATEGORY_IMG_RESOURCE = "cat_img";
 
+    public static final String TABLE_CURRENCY = "currency";
+    public static final String COLUMN_CURRENCY_MARKS = "currency_marks";
+    public static final String COLUMN_CURRENCY_COINS = "currency_coins";
+
     public DBManager(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -46,6 +50,14 @@ public class DBManager extends SQLiteOpenHelper {
                 ");";
 
         db.execSQL(query);
+
+        query = "CREATE TABLE " + TABLE_CURRENCY + "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," +
+                COLUMN_CURRENCY_MARKS + " INTEGER ," +
+                COLUMN_CURRENCY_COINS + " INTEGER" +
+                ");";
+
+        db.execSQL(query);
     }
 
 
@@ -53,6 +65,7 @@ public class DBManager extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CURRENCY);
         onCreate(db);
     }
 
@@ -77,6 +90,35 @@ public class DBManager extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void resetTable(){
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
+
+        String query = "CREATE TABLE " + TABLE_CATEGORIES + "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," +
+                COLUMN_CATEGORY_NAME + " TEXT ," +
+                COLUMN_CATEGORY_ID + " INTEGER ," +
+                COLUMN_CORRECT_ANSWERS + " INTEGER ," +
+                COLUMN_WRONG_ANSWERS + " INTEGER ," +
+                COLUMN_CATEGORY_IMG_RESOURCE + " INTEGER ," +
+                COLUMN_CATEGORY_ISLOCKED + " INTEGER" +
+                ");";
+
+        db.execSQL(query);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CURRENCY);
+
+        query = "CREATE TABLE " + TABLE_CURRENCY + "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," +
+                COLUMN_CURRENCY_MARKS + " INTEGER ," +
+                COLUMN_CURRENCY_COINS + " INTEGER" +
+                ");";
+
+        db.execSQL(query);
+
+        db.close();
+    }
+
     public void removeCategory(Category t){
         SQLiteDatabase db = getWritableDatabase();
         String selection = COLUMN_CATEGORY_ID + "= ?";
@@ -84,6 +126,51 @@ public class DBManager extends SQLiteOpenHelper {
 
         db.delete(TABLE_CATEGORIES, selection, selectionArgs);
         db.close();
+    }
+
+    public int returnMarks(){
+
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.query(TABLE_CURRENCY,
+                new String[]{COLUMN_ID, COLUMN_CURRENCY_MARKS, COLUMN_CURRENCY_COINS},
+                null, null, null, null, null);
+
+        if (c != null ) {
+            if  (c.moveToFirst()) {
+                do {
+                    int marks = c.getInt(c.getColumnIndex("currency_marks"));
+                    int coins = c.getInt(c.getColumnIndex("currency_coins"));
+
+                    return marks;
+
+
+                }while (c.moveToNext());
+            }
+        }
+        db.close();
+        return 0;
+    }
+
+    public int returnCoins(){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.query(TABLE_CURRENCY,
+                new String[]{COLUMN_ID, COLUMN_CURRENCY_MARKS, COLUMN_CURRENCY_COINS},
+                null, null, null, null, null);
+
+        if (c != null ) {
+            if  (c.moveToFirst()) {
+                do {
+                    int marks = c.getInt(c.getColumnIndex("currency_marks"));
+                    int coins = c.getInt(c.getColumnIndex("currency_coins"));
+
+                    return coins;
+
+
+                }while (c.moveToNext());
+            }
+        }
+        db.close();
+        return 0;
     }
 
     public Category returnCategory(int id){
@@ -171,24 +258,41 @@ public class DBManager extends SQLiteOpenHelper {
         return categoryList;
     }
 
-/*    public void changeTaskStatus(Task t){
-        Log.v("Before: ",String.valueOf(t.getDone()));
-        t.setDone(!t.getDone());
+    public void updateCategory(Category c, int correctAnswers, int wrongAnswers){
+
+        Log.v("correct answers: ", String.valueOf(correctAnswers));
+
+        int totalCorrect = c.getCorrectAnswerTotal() + correctAnswers;
+        int totalWrong = c.getWrongAnswerTotal() + wrongAnswers;
+
 
         ContentValues values = new ContentValues();
-        values.put(COLUMN_TASKNAME, t.getTaskName());
-        values.put(COLUMN_TASKISDONE, t.getDone());
+        values.put(COLUMN_CATEGORY_NAME, c.getName());
+        values.put(COLUMN_CATEGORY_ID, c.getId());
+        values.put(COLUMN_CORRECT_ANSWERS, totalCorrect);
+        values.put(COLUMN_WRONG_ANSWERS, totalWrong);
+        values.put(COLUMN_CATEGORY_IMG_RESOURCE, c.getImage());
 
-        String selection = COLUMN_ID + "= ?";
-        String[] selectionArgs = {String.valueOf(t.getTaskID())};
+        if(c.isLocked() == true){
+            values.put(COLUMN_CATEGORY_ISLOCKED, 1);
+        }
+
+        else{
+            values.put(COLUMN_CATEGORY_ISLOCKED, 0);
+        }
+
+        String selection = COLUMN_CATEGORY_ID + "= ?";
+        String[] selectionArgs = {String.valueOf(c.getId())};
 
         SQLiteDatabase db = getReadableDatabase();
 
-        db.update(TABLE_TASKS,
+        db.update(TABLE_CATEGORIES,
                 values,
                 selection,
                 selectionArgs);
+
+        Log.v("DBMANAGER: ", String.valueOf(returnCategory(c.getId()).getCorrectAnswerTotal()));
+
         db.close();
-        Log.v("After: ",String.valueOf(t.getDone()));
-    }*/
+    }
 }

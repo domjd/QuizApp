@@ -2,13 +2,19 @@ package uk.dom.quizapp.activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,9 +25,11 @@ import retrofit2.Response;
 import uk.dom.quizapp.R;
 import uk.dom.quizapp.fragments.QuestionFragment;
 import uk.dom.quizapp.fragments.QuizEndFragment;
+import uk.dom.quizapp.models.Category;
 import uk.dom.quizapp.models.LocalQuestion;
 import uk.dom.quizapp.models.Question;
 import uk.dom.quizapp.models.Quiz;
+import uk.dom.quizapp.presenters.DatabasePresenter;
 import uk.dom.quizapp.presenters.QuizPresenter;
 import uk.dom.quizapp.tools.QuizCallBack;
 import uk.dom.quizapp.ui.QuizView;
@@ -32,13 +40,18 @@ public class QuizActivity extends AppCompatActivity implements QuizCallBack, Qui
     private QuizViewPager quizPager;
     private QuizPagerAdapter quizPagerAdapter;
 
-    private List<LocalQuestion> wrongQuestions;
+    private ArrayList<LocalQuestion> wrongQuestions;
 
     private QuizPresenter presenter;
+
+    private DatabasePresenter dbPresenter;
 
     private ProgressDialog progressDialog;
 
     private int categoryID;
+
+    private Button homeButton;
+    private Button questionSummaryButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +64,7 @@ public class QuizActivity extends AppCompatActivity implements QuizCallBack, Qui
         categoryID = i.getExtras().getInt("categoryID");
 
         presenter = new QuizPresenter(getApplicationContext(), this);
+        dbPresenter = new DatabasePresenter(this);
 
         presenter.loadQuiz(categoryID);
 
@@ -58,6 +72,25 @@ public class QuizActivity extends AppCompatActivity implements QuizCallBack, Qui
         quizPagerAdapter = new QuizPagerAdapter(getSupportFragmentManager());
 
         wrongQuestions = new ArrayList<>();
+        questionSummaryButton = (Button) findViewById(R.id.question_summary_button);
+        homeButton = (Button) findViewById(R.id.home_button);
+
+        homeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(QuizActivity.this, MainActivity.class);
+                startActivity(i);
+            }
+        });
+
+        questionSummaryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(QuizActivity.this, QuestionSummary.class);
+                i.putExtra("question_array", (Serializable) wrongQuestions);
+                startActivity(i);
+            }
+        });
 
     }
 
@@ -69,7 +102,35 @@ public class QuizActivity extends AppCompatActivity implements QuizCallBack, Qui
             wrongQuestions.add(localQuestion);
         }
 
-        quizPager.setCurrentItem(quizPager.getCurrentItem() + 1, true);
+        else{
+            MediaPlayer snd = MediaPlayer.create(this, R.raw.ding);
+            snd.start();
+        }
+        Log.v("current pager item: ", String.valueOf(quizPager.getCurrentItem()));
+
+        if(quizPager.getCurrentItem() < 9)
+            quizPager.setCurrentItem(quizPager.getCurrentItem() + 1, true);
+
+        else{
+            quizPager.setVisibility(View.INVISIBLE);
+            CardView endCard = (CardView) findViewById(R.id.end_card);
+            TextView scoreText = (TextView)findViewById(R.id.score_text);
+
+            int score = 10 - wrongQuestions.size();
+
+            scoreText.setText(String.valueOf(score) + " /10");
+
+            endCard.setVisibility(View.VISIBLE);
+
+            Category c = dbPresenter.returnCategory(categoryID);
+
+            Log.v("Category NAME: ", c.getName());
+
+            int correct = score;
+            int wrong = wrongQuestions.size();
+
+            dbPresenter.updateCategory(c, correct, wrong);
+        }
 
     }
 
@@ -92,10 +153,6 @@ public class QuizActivity extends AppCompatActivity implements QuizCallBack, Qui
 
             quizPagerAdapter.addFragment(questionFragment);
         }
-
-        QuizEndFragment quizEndFragment = new QuizEndFragment();
-        quizEndFragment.setWrongQuestions(wrongQuestions);
-        quizPagerAdapter.addFragment(quizEndFragment);
         quizPager.setAdapter(quizPagerAdapter);
         progressDialog.dismiss();
     }

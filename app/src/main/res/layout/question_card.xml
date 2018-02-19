@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <android.support.v7.widget.CardView
@@ -17,7 +19,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/summary_question"
-                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
                 android:text="example question"/>
 
             <TextView
@@ -25,6 +27,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/user_answer"
                 android:text="wrong answer"
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
                 android:textColor="@android:color/holo_red_dark" />
 
             <TextView
@@ -32,6 +35,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/correct_answer"
                 android:text="correct answer"
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
                 android:textColor="@android:color/holo_green_dark" />
 
         </LinearLayout>

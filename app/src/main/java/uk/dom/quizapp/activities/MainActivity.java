@@ -1,8 +1,6 @@
 package uk.dom.quizapp.activities;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +8,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,14 +17,9 @@ import android.widget.TextView;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import uk.dom.quizapp.adapters.CategoryAdapter;
 import uk.dom.quizapp.R;
@@ -51,10 +45,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        setTitle("John Smith");
 
         noDataLayout = (LinearLayout) findViewById(R.id.no_data_layout);
 
         presenter = new DatabasePresenter(this);
+        //presenter.resetTable();
+
+        //TextView markText = (TextView) findViewById(R.id.mark_count);
+        //markText.setText(String.valueOf(presenter.getMarks()) + " Marks");
+
+        //TextView coinText = (TextView) findViewById(R.id.coin_count);
+        //coinText.setText(String.valueOf(presenter.getCoins()) + " Coins");
 
         TextView noDataText = (TextView) findViewById(R.id.no_data_text);
         ImageView noDataImage = (ImageView) findViewById(R.id.no_data_image);
@@ -62,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
         if(presenter.checkIsDataNull() == true){
             CardView summaryCard = (CardView) findViewById(R.id.pie_card);
             CardView statsCard = (CardView) findViewById(R.id.category_stats_card);
+
+            Log.v("MAIN: ", "DATA IS NULL");
 
             summaryCard.setVisibility(View.INVISIBLE);
             statsCard.setVisibility(View.INVISIBLE);
@@ -72,9 +76,14 @@ public class MainActivity extends AppCompatActivity {
 
         else{
 
-            noDataText.setVisibility(View.INVISIBLE);
-            noDataImage.setVisibility(View.VISIBLE);
+            noDataText.setVisibility(View.GONE);
+            noDataImage.setVisibility(View.GONE);
+            noDataText.setEnabled(false);
+            noDataImage.setEnabled(false);
+
             setupPieChart();
+
+            Log.v("MAIN: ", "DATA IS NOT NULL");
 
             categoryRecycler = (RecyclerView) findViewById(R.id.category_recycler);
             linearLayoutManager = new LinearLayoutManager(this);
@@ -83,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
             categoryRecycler.setAdapter(categoryAdapter);
         }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.new_quiz_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
